@@ -1,5 +1,6 @@
 import { Page, Locator } from '@playwright/test';
 import { BasePage } from './base.page';
+import { LoginLocators } from '../locators/login.locators';
 
 export class LoginPage extends BasePage {
   readonly loginNavButton: Locator;
@@ -9,12 +10,13 @@ export class LoginPage extends BasePage {
   readonly nameUserDisplay: Locator;
 
   constructor(page: Page) {
-    super(page); // Memanggil constructor dari BasePage
-    this.loginNavButton = page.locator('#login2');
-    this.usernameInput = page.locator('#loginusername');
-    this.passwordInput = page.locator('#loginpassword');
-    this.loginSubmitButton = page.locator('button[onclick="logIn()"]');
-    this.nameUserDisplay = page.locator('#nameofuser');
+    super(page);
+
+    this.loginNavButton = page.locator(LoginLocators.loginNavButton);
+    this.usernameInput = page.locator(LoginLocators.usernameInput);
+    this.passwordInput = page.locator(LoginLocators.passwordInput);
+    this.loginSubmitButton = page.locator(LoginLocators.loginSubmitButton);
+    this.nameUserDisplay = page.locator(LoginLocators.nameUserDisplay);
   }
 
   async login(username: string, password: string) {

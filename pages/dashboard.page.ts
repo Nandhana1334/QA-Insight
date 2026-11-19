@@ -1,5 +1,6 @@
 import { Page, Locator } from '@playwright/test';
 import { BasePage } from './base.page';
+import { DashboardLocators } from '../locators/dashboard.locators';
 
 export class DashboardPage extends BasePage {
   readonly firstProductLink: Locator;
@@ -8,18 +9,27 @@ export class DashboardPage extends BasePage {
 
   constructor(page: Page) {
     super(page);
-    this.firstProductLink = page.locator('.card-title a').first();
-    this.addToCartButton = page.locator('text=Add to cart');
-    this.cartNavButton = page.locator('#cartur');
+
+    this.firstProductLink = page.locator(DashboardLocators.firstProductLink).first();
+    this.addToCartButton = page.locator(DashboardLocators.addToCartButton);
+    this.cartNavButton = page.locator(DashboardLocators.cartNavButton);
   }
 
-  async addFirstProductToCart() {
-    await this.clickElement(this.firstProductLink, 'Open first product');
+  async addProductToCart(productName: string) {
+  await this.navigateTo('/');
 
-    this.page.once('dialog', async (dialog) => {
-      await dialog.accept();
-    });
+  const productLink = this.page
+    .locator(DashboardLocators.firstProductLink)
+    .filter({ hasText: productName });
 
-    await this.clickElement(this.addToCartButton, 'Add first product to cart');
-  }
+  await this.clickElement(productLink, `Open ${productName}`);
+
+  await Promise.all([
+    this.page.waitForEvent('dialog').then((dialog) => dialog.accept()),
+    this.clickElement(
+      this.addToCartButton,
+      `Add ${productName} to cart`,
+    ),
+  ]);
+}
 }
