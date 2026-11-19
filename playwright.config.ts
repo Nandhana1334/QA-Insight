@@ -32,9 +32,9 @@ export default defineConfig({
     baseURL: 'https://demoblaze.com',
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
-    trace: 'on-first-retry',
-    screenshot: 'on',
-    video: 'on',
+   trace: 'retain-on-failure',
+screenshot: 'only-on-failure',
+video: 'retain-on-failure',
   },
 
   /* Configure projects for major browsers */

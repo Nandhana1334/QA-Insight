@@ -16,8 +16,10 @@ export class BasePage {
   }
 
   async navigateTo(url: string) {
-    await this.page.goto(url);
-  }
+  await this.page.goto(url, {
+    waitUntil: 'domcontentloaded',
+  });
+}
 
   async clickElement(locator: Locator, step: string) {
     StepLogger.log(step);

@@ -160,4 +160,5 @@ expect(total).toBe(expectedTotal);
 
     await expect(page).toHaveURL(/cart\.html$/);
   });
+  
 });

@@ -35,9 +35,19 @@ test.afterEach(async ({ page }, testInfo) => {
 
   const html = await page.content();
 
-  const htmlPath = path.join('test-results', 'html', `${testInfo.testId}.html`);
+const htmlPath = path.join(
+  'test-results',
+  'html',
+  `${testInfo.testId}.html`,
+);
 
-  fs.writeFileSync(htmlPath, html);
+fs.writeFileSync(htmlPath, html);
+
+testInfo.attachments.push({
+  name: 'failure-html',
+  path: htmlPath,
+  contentType: 'text/html',
+});
 
   const consoleErrors = ((page as any).__consoleErrors as string[]) ?? [];
 
