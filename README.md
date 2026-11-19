@@ -1,360 +1,161 @@
-# Playwright AI-Powered Automation Framework
+# QA Insight – Intelligent Test Automation Framework
 
-> _A modular Playwright automation framework built with TypeScript, designed for extensibility and enhanced with AI-powered capabilities._
+## Overview
 
-A reusable end-to-end automation testing framework built with **Playwright** and **TypeScript**, designed using the **Page Object Model (POM)** architecture and enhanced with **AI-assisted failure analysis** powered by Google Gemini.
+QA Insight is a TypeScript-based test automation framework built using Playwright. It is designed to automate web application workflows, capture execution evidence, and provide intelligent analysis of test failures.
 
-The framework currently includes an AI extension that analyzes failed Playwright tests using **Google Gemini**, helping QA Engineers understand possible root causes faster through contextual failure analysis.
+The framework combines reusable automation components with centralized reporting and AI-assisted failure analysis to make debugging easier and improve test maintenance.
 
----
+## Key Features
 
-# Why This Project?
+- **Browser Automation:** End-to-end testing using Playwright and TypeScript.
+- **Page Object Model:** Reusable page classes for better test organization and maintainability.
+- **Custom Fixtures:** Shared test setup and reusable browser context.
+- **Execution Logging:** Step-level logging to track test execution.
+- **Failure Evidence Collection:** Captures screenshots, videos, console errors, and error context.
+- **Custom Test Reporter:** Collects failed test details and triggers failure analysis.
+- **AI-Assisted Failure Analysis:** Integrates with the Gemini API to analyze test failures using available execution evidence.
+- **HTML Reporting:** Generates Playwright HTML reports for reviewing test results.
 
-Playwright already provides excellent debugging artifacts such as screenshots, videos, and traces.
+## Technology Stack
 
-However, engineers still need to manually inspect those artifacts to determine why a test failed.
-
-This project explores how AI can assist the debugging process by automatically collecting execution artifacts and generating an initial failure analysis.
-
-The goal is **not to replace engineering judgment**, but to reduce investigation time and provide a faster starting point for debugging.
-
----
-
-## Design Principles
-
-This framework is built around several core principles:
-
-- Modular
-- Reusable
-- Extensible
-- Maintainable
-- AI-Enhanced
-
-The architecture is intentionally designed so new capabilities (AI or non-AI) can be added without significantly changing the existing framework.
-
----
-
-## Current Scope
-
-This repository focuses primarily on **framework architecture and design** rather than providing a large collection of automated test cases.
-
-Only a small number of sample tests are included to demonstrate how the framework is intended to be used.
-
-The emphasis is on building a reusable foundation that can be extended for real-world automation projects.
-
----
-
-## Features
-
-### Automation Framework
-
-- Playwright + TypeScript
-- Page Object Model (POM)
-- Reusable Base Page
-- Custom Playwright Fixture
-- Custom Playwright Reporter
-- Automatic HTML Snapshot Collection
-- Browser Console Error Collection
-- Screenshot on Failure
-- Video Recording on Failure
-- Playwright Trace Support
-
-### AI Extension
-
-Current AI capability includes:
-
-- AI-assisted failure analysis
-- HTML-aware analysis
-- Screenshot-aware analysis
-- Console error analysis
-- Root cause suggestions
-- Confidence estimation
-- Playwright best practice recommendations
-
----
+| Technology | Purpose |
+|---|---|
+| TypeScript | Programming language |
+| Playwright | Browser automation |
+| Node.js | Runtime environment |
+| Gemini API | AI-assisted failure analysis |
+| Git | Version control |
+| GitHub Actions | CI/CD workflow |
 
 ## Project Structure
 
 ```text
-playwright-ai/
+QA-Insight/
 │
-├── .env.example
-├── .gitignore
-├── package.json
-├── package-lock.json
-├── playwright.config.ts
-├── tsconfig.json
+├── .github/
+│   └── workflows/
+│       └── playwright.yml
 │
 ├── fixtures/
 │   └── base-test.ts
 │
 ├── pages/
 │   ├── base.page.ts
-│   ├── login.page.ts
-│   └── dashboard.page.ts
+│   ├── dashboard.page.ts
+│   └── login.page.ts
 │
 ├── reporters/
 │   └── ai-reporter.ts
 │
 ├── tests/
-│   └── *.spec.ts
+│   └── e2e-shopping.spec.ts
 │
 ├── utils/
 │   ├── ai-helper.ts
 │   ├── ai-types.ts
 │   └── step-logger.ts
 │
+├── playwright.config.ts
+├── tsconfig.json
+├── package.json
 └── README.md
 ```
 
----
+## Framework Workflow
 
-## Framework Architecture
+1. Playwright starts the browser and executes the test cases.
+2. Reusable page objects handle browser interactions.
+3. Custom fixtures provide shared test setup.
+4. Step logging records important test actions.
+5. When a test fails, the framework collects available execution evidence.
+6. The custom reporter sends the failure details and available evidence to the AI analysis component.
+7. Gemini is used to generate a technical explanation and recommended solution when the API is available.
+8. Playwright HTML reporting provides an overview of test execution.
 
-```text
-Playwright Test
-        │
-        ▼
- Execute Test
-        │
-        ▼
- Test Passed?
-      │
- ┌────┴────┐
- │         │
-Yes       No
- │         │
- │         ▼
- │   Collect Execution Artifacts
- │
- │   • Playwright Error
- │   • HTML Snapshot
- │   • Screenshot
- │   • Console Errors
- │   • Video
- │   • Trace
- │
- │         ▼
- │   Build AI Prompt
- │
- │         ▼
- │   Google Gemini
- │
- │         ▼
- │ Root Cause Analysis
- │
- ▼
- Test Finished
-```
+## Setup and Installation
 
----
+### Prerequisites
 
-## AI Failure Analysis
+- Node.js
+- npm
+- Visual Studio Code (recommended)
 
-When a test fails, the framework automatically gathers contextual information before sending it to Google Gemini.
-
-The collected information includes:
-
-- Playwright error message
-- HTML snapshot
-- Screenshot (image input)
-- Browser console errors
-- Video metadata
-- Trace metadata
-
-Gemini analyzes the available information and generates:
-
-- Failure summary
-- Possible root causes
-- Supporting evidence
-- Confidence level
-- Severity assessment
-- Suggested solution
-- Playwright best practices
-
-> **Note**
->
-> The current AI prompt and analysis output are written in **Bahasa Indonesia**. They can be easily customized by modifying the prompt inside `utils/ai-helper.ts`.
-
----
-
-## Example AI Analysis
-
-```text
-================ PLAYWRIGHT AI REPORT ================
-
-Test
-User should add product into cart
-
-Status
-FAILED
-
-Playwright Error
-
-locator('#cart') not visible
-
-======================================================
-
-Ringkasan
-
-Element belum dapat diakses karena masih tertutup loading overlay.
-
-Penyebab Kemungkinan
-
-• Loading spinner belum selesai.
-• Timing issue.
-• Overlay masih aktif.
-
-Confidence
-
-93%
-
-Severity
-
-Medium
-
-Solusi
-
-Lakukan explicit wait terhadap loading spinner sebelum melakukan click.
-
-Best Practice
-
-Pastikan halaman berada pada state yang stabil sebelum melakukan interaksi.
-```
-
----
-
-## AI Configuration
-
-The framework uses the official **Google Gen AI SDK**.
-
-The AI model can be changed inside:
-
-```text
-utils/ai-helper.ts
-```
-
-Example:
-
-```ts
-model: 'gemini-3.5-flash';
-```
-
-You may replace it with any model available in your own Gemini account.
-
-For example:
-
-- gemini-3.5-flash
-- gemini-3.1-pro
-- gemini-3-flash-preview
-- or any future supported Gemini model
-
----
-
-## Technology Stack
-
-| Technology    | Purpose               |
-| ------------- | --------------------- |
-| Playwright    | UI Automation         |
-| TypeScript    | Test Development      |
-| Google Gemini | AI Failure Analysis   |
-| Node.js       | Runtime               |
-| dotenv        | Environment Variables |
-
----
-
-## Getting Started
-
-### Clone Repository
-
-```bash
-git clone https://github.com/your-username/playwright-ai.git
-
-cd playwright-ai
-```
-
-### Install Dependencies
+### 1. Install dependencies
 
 ```bash
 npm install
 ```
 
-### Install Playwright Browsers
+### 2. Install Playwright browser
 
 ```bash
-npx playwright install
+npx playwright install chromium
 ```
 
-### Configure Environment Variables
+### 3. Configure Gemini API
 
-Create a `.env` file.
+Create a `.env` file in the project root:
 
 ```env
 GEMINI_API_KEY=your_api_key
 ```
 
----
+Keep the `.env` file private. Do not commit API keys to version control.
 
-## Run Tests
-
-Run all tests
+### 4. Run the test suite
 
 ```bash
 npx playwright test
 ```
 
-Run a specific file
-
-```bash
-npx playwright test tests/login.spec.ts
-```
-
-Run headed mode
+### 5. Run tests in headed mode
 
 ```bash
 npx playwright test --headed
 ```
 
-Run UI mode
+### 6. View the HTML report
 
 ```bash
-npx playwright test --ui
+npx playwright show-report
 ```
 
----
+## AI-Assisted Failure Analysis
 
-## Generated Test Artifacts
+The framework includes an AI analysis component that uses available test execution information to investigate failures.
 
-When a test fails, Playwright generates:
+The analysis considers:
 
-- Screenshot
-- Video
-- Trace
-
-Additionally, this framework collects:
-
-- HTML snapshot
+- Playwright assertion errors
+- Page HTML
 - Browser console errors
-- AI-generated failure analysis
+- Screenshots
 
----
+The intended output includes:
 
-## Future Enhancements
+- Failure summary
+- Possible root cause
+- Supporting evidence
+- Confidence assessment
+- Severity
+- Recommended solution
+- Playwright best practices
 
-| Feature                   | Purpose                                                     |
-| ------------------------- | ----------------------------------------------------------- |
-| Network Request Analysis  | Allow AI to detect failed API/resource requests             |
-| Step History Analysis     | Help AI understand the sequence of events before failure    |
-| API Testing Module        | Support API automation within the same framework            |
-| Visual Regression Testing | Detect unexpected UI changes                                |
-| GitHub Actions CI/CD      | Run automated tests on every push                           |
-| Allure Report             | Generate rich HTML reports                                  |
-| Cross-Browser Execution   | Validate Chromium, Firefox, and WebKit in a single pipeline |
+Video and trace artifacts are also collected as execution evidence, although they are not currently uploaded to Gemini for direct analysis.
 
----
+AI analysis depends on Gemini API availability and valid API access. If the service is unavailable, the framework reports the API error while retaining the original Playwright failure information.
 
-## License
+## Future Improvements
 
-This project is intended for learning, experimentation, and portfolio purposes.
+- Rule-based failure classification
+- Enhanced AI-powered root-cause analysis
+- Structured failure reports
+- Test execution dashboard
+- API automation integration
+- Cross-browser execution
+- Improved CI/CD reporting
+- Historical test failure tracking
 
-Feel free to use it! ❤️
+
+
