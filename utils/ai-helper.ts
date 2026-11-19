@@ -1,3 +1,4 @@
+
 import { GoogleGenAI } from '@google/genai';
 import fs from 'node:fs';
 import mime from 'mime';
@@ -12,7 +13,7 @@ export class AiHelper {
     if (!path) {
       return {
         exists: false,
-        status: '✗ Tidak tersedia',
+        status: 'Not available',
         imagePart: undefined,
       };
     }
@@ -20,7 +21,7 @@ export class AiHelper {
     if (!fs.existsSync(path)) {
       return {
         exists: false,
-        status: `✗ Tidak ditemukan\nPath : ${path}`,
+        status: `File not found\nPath: ${path}`,
         imagePart: undefined,
       };
     }
@@ -30,14 +31,14 @@ export class AiHelper {
     if (!mimeType?.startsWith('image/')) {
       return {
         exists: false,
-        status: `✗ Bukan file gambar\nPath : ${path}`,
+        status: `Not an image file\nPath: ${path}`,
         imagePart: undefined,
       };
     }
 
     return {
       exists: true,
-      status: `✓ Tersedia\nPath : ${path}`,
+      status: `Available\nPath: ${path}`,
       imagePart: {
         inlineData: {
           mimeType,
@@ -51,20 +52,20 @@ export class AiHelper {
     if (!path) {
       return {
         exists: false,
-        text: '✗ Tidak tersedia',
+        text: 'Not available',
       };
     }
 
     if (!fs.existsSync(path)) {
       return {
         exists: false,
-        text: `✗ Tidak ditemukan\nPath : ${path}`,
+        text: `File not found\nPath: ${path}`,
       };
     }
 
     return {
       exists: true,
-      text: `✓ Tersedia\nPath : ${path}`,
+      text: `Available\nPath: ${path}`,
       path,
     };
   }
@@ -75,37 +76,37 @@ export class AiHelper {
     const trace = this.getFileStatus(data.tracePath);
 
     const prompt = `
-Kamu adalah seorang Senior QA Automation Engineer dan SDET Expert.
+You are a Senior QA Automation Engineer and SDET Expert.
 
-Tugasmu adalah menentukan root cause (akar penyebab) kegagalan automated test Playwright berdasarkan seluruh informasi yang diberikan.
+Your task is to identify the root cause of a Playwright automated test failure using all the available information.
 
-Jangan langsung menyimpulkan bahwa locator salah.
+Do not immediately assume that the locator is incorrect.
 
-Pertimbangkan seluruh kemungkinan seperti:
+Consider all possible causes, including:
 
-- Bug pada aplikasi
+- Application bug
 - Timing issue
-- Locator tidak unik
-- Locator berubah
-- Element hidden
-- JavaScript Error
-- Network Error
-- Race Condition
-- Test script yang kurang stabil
+- Non-unique locator
+- Locator changes
+- Hidden element
+- JavaScript error
+- Network error
+- Race condition
+- Unstable test script
 
-Jika bukti tidak cukup untuk memastikan penyebabnya, katakan dengan jujur dan jelaskan informasi tambahan yang diperlukan.
+If there is insufficient evidence to confirm the root cause, clearly state that and explain what additional information is required.
 
 ==============================
-INFORMASI TEST
+TEST INFORMATION
 ==============================
 
-Nama Test:
+Test Name:
 ${data.testName}
 
 Status:
 ${data.status}
 
-Durasi:
+Duration:
 ${data.duration} ms
 
 ==============================
@@ -121,171 +122,198 @@ HTML
 ${data.html.substring(0, 8000)}
 
 ...
-(HTML dipotong agar tidak melebihi batas token AI)
+(HTML truncated to avoid exceeding the AI token limit)
 
 ==============================
 CONSOLE ERRORS
 ==============================
 
-${data.consoleLogs || 'Tidak ada console error'}
+${data.consoleLogs || 'No console errors found'}
 
 ==============================
-ARTEFAK
+ARTIFACTS
 ==============================
 
 Screenshot:
 ${screenshot.status}
 
-Dikirim ke AI:
-${screenshot.imagePart ? '✓ Ya' : '✗ Tidak'}
+Sent to AI:
+${screenshot.imagePart ? 'Yes' : 'No'}
 
 Video:
-${video.exists ? '✓ Ya' : '✗ Tidak'}
+${video.exists ? 'Available' : 'Not available'}
 ${video.text}
 
 Trace:
-${trace.exists ? '✓ Ya' : '✗ Tidak'}
+${trace.exists ? 'Available' : 'Not available'}
 ${trace.text}
 
-
 ==============================
-TUGAS
+ANALYSIS INSTRUCTIONS
 ==============================
 
-Gunakan SELURUH informasi yang tersedia.
+Use ALL available information.
 
-Prioritas analisis:
+Analysis priorities:
 
-1. Pesan error Playwright.
-2. Screenshot (jika dikirim ke AI).
-3. HTML halaman.
-4. Informasi artefak.
+1. Playwright error message.
+2. Screenshot, if provided.
+3. Page HTML.
+4. Artifact information.
 
-Apabila screenshot tersedia:
+If a screenshot is available:
 
-- Analisis kondisi visual halaman.
-- Periksa apakah terdapat modal.
-- Periksa apakah terdapat popup.
-- Periksa apakah terdapat loading spinner.
-- Periksa apakah terdapat toast notification.
-- Periksa apakah terdapat overlay.
-- Periksa apakah halaman kosong.
-- Periksa apakah halaman gagal dirender.
-- Periksa apakah element target benar-benar terlihat.
-- Bandingkan screenshot dengan Playwright Error.
+- Analyze the visual state of the page.
+- Check whether a modal is present.
+- Check whether a popup is present.
+- Check whether a loading spinner is visible.
+- Check whether a toast notification is visible.
+- Check whether an overlay is present.
+- Check whether the page is blank.
+- Check whether the page failed to render.
+- Check whether the target element is actually visible.
+- Compare the screenshot with the Playwright error.
 
-Apabila HTML tersedia:
+If HTML is available:
 
-- Cari apakah locator memang ada.
-- Cari apakah locator hidden.
-- Cari apakah locator disabled.
-- Cari apakah locator berada di dalam modal.
-- Cari apakah locator berada di dalam element hidden.
-- Cari indikasi perubahan DOM.
-- Cari kemungkinan page belum selesai render.
-- Cari kemungkinan timing issue.
+- Check whether the locator exists.
+- Check whether the locator is hidden.
+- Check whether the locator is disabled.
+- Check whether the locator is inside a modal.
+- Check whether the locator is inside a hidden element.
+- Look for possible DOM changes.
+- Look for possible page rendering or timing issues.
 
-Gunakan Console Error untuk:
+Use console errors to identify:
 
-- menemukan JavaScript Error
-- mendeteksi uncaught exception
-- mendeteksi fetch/XHR gagal
-- mendeteksi CORS
-- mendeteksi gagal memuat resource
-- mendeteksi error React/Vue/Angular
+- JavaScript errors
+- Uncaught exceptions
+- Failed fetch or XHR requests
+- CORS errors
+- Failed resource loading
+- React, Vue, or Angular errors
 
-Jangan membuat asumsi yang tidak didukung oleh bukti.
+Do not make assumptions that are not supported by evidence.
 
-Berikan jawaban dengan format:
+Provide your analysis using the following format:
 
-## Ringkasan
+## Summary
 
-Jelaskan penyebab utama dalam 1–2 kalimat.
+Explain the main cause in 1–2 sentences.
 
 ---
 
-## Penyebab Kemungkinan
+## Possible Root Cause
 
-Jelaskan analisis teknis secara rinci.
+Explain the technical analysis in detail.
 
 ---
 
-## Bukti yang Mendukung
+## Supporting Evidence
 
-Sebutkan bukti yang ditemukan dari:
+List the evidence found from:
 
 - Playwright Error
 - Screenshot
 - HTML
 - Console Error
 
+Clearly distinguish between available evidence and missing evidence.
+
 ---
 
 ## Confidence
 
-Nilai: xx%
+Score: XX%
 
-Alasan pemberian confidence.
+Explain why you assigned this confidence score.
 
 ---
 
 ## Severity
 
-Pilih salah satu:
+Choose one:
 
 - Low
 - Medium
 - High
 - Critical
 
-Jelaskan alasannya.
+Explain the reason for the selected severity.
 
 ---
 
-## Solusi
+## Recommended Solution
 
-Berikan langkah perbaikan yang paling direkomendasikan.
+Provide the most appropriate steps to fix the issue.
 
 ---
 
-## Best Practice Playwright
+## Playwright Best Practices
 
-Berikan rekomendasi agar test menjadi lebih stabil dan tidak mudah flaky.
+Provide recommendations to make the test more stable and reduce flaky failures.
 
 =================================================
-ATURAN
+RULES
 =================================================
 
-- Jangan mengarang informasi.
-- Jangan menyimpulkan tanpa bukti.
-- Jika terdapat beberapa kemungkinan penyebab, urutkan dari yang paling mungkin.
-- Selalu jelaskan alasan setiap kesimpulan.
-- Gunakan Bahasa Indonesia yang singkat, jelas, dan profesional.
+- Do not invent information.
+- Do not make conclusions without supporting evidence.
+- If multiple possible causes exist, rank them from most likely to least likely.
+- Always explain the reasoning behind each conclusion.
+- Use clear, concise, and professional English.
 `;
 
-    try {
-      const contents: Array<
-        { text: string } | { inlineData: { mimeType: string; data: string } }
-      > = [];
+    const maxAttempts = 3;
 
-      if (screenshot.imagePart) {
-        contents.push(screenshot.imagePart);
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+      try {
+        const contents: Array<
+          { text: string } | { inlineData: { mimeType: string; data: string } }
+        > = [];
+
+        if (screenshot.imagePart) {
+          contents.push(screenshot.imagePart);
+        }
+
+        contents.push({
+          text: prompt,
+        });
+
+        const response = await ai.models.generateContent({
+          model: 'gemini-3.8-flash',
+          contents,
+        });
+
+        return response.text ?? 'AI did not provide a response.';
+      } catch (error) {
+        const errorMessage =
+          error instanceof Error ? error.message : String(error);
+
+        const isTemporaryError =
+          errorMessage.includes('503') ||
+          errorMessage.includes('429') ||
+          errorMessage.includes('UNAVAILABLE') ||
+          errorMessage.includes('RESOURCE_EXHAUSTED');
+
+        if (!isTemporaryError || attempt === maxAttempts) {
+          return `Failed to get analysis from Gemini AI:
+
+${errorMessage}
+
+Attempts: ${attempt}/${maxAttempts}`;
+        }
+
+        console.log(
+          `Gemini temporarily unavailable. Retrying (${attempt}/${maxAttempts})...`,
+        );
+
+        await new Promise((resolve) =>
+          setTimeout(resolve, attempt * 2000),
+        );
       }
-
-      contents.push({
-        text: prompt,
-      });
-
-      const response = await ai.models.generateContent({
-        model: 'gemini-3.5-flash',
-        contents: contents,
-      });
-
-      return response.text ?? 'AI tidak memberikan respons.';
-    } catch (error) {
-      return `Gagal mendapatkan analisis dari Gemini AI:
-
-${error instanceof Error ? error.message : String(error)}`;
     }
+
+    return 'Gemini analysis failed after all retry attempts.';
   }
 }

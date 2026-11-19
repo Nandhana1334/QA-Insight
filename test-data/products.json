@@ -1,8 +1,10 @@
 {
   "firstProduct": {
-    "name": "Samsung galaxy s6"
+    "name": "Samsung galaxy s6",
+    "price": 360
   },
   "secondProduct": {
-    "name": "Nokia lumia 1520"
+    "name": "Nokia lumia 1520",
+    "price": 820
   }
 }

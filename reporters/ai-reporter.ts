@@ -1,3 +1,4 @@
+
 import type { Reporter, TestCase, TestResult } from '@playwright/test/reporter';
 
 import fs from 'node:fs';
@@ -6,10 +7,12 @@ import path from 'node:path';
 import { AiHelper } from '../utils/ai-helper';
 
 export default class AiReporter implements Reporter {
+  private pendingAnalyses: Promise<void>[] = [];
+
   onTestEnd(test: TestCase, result: TestResult): void {
     if (result.status !== 'failed') return;
 
-    void this.generateAnalysis(test, result);
+    this.pendingAnalyses.push(this.generateAnalysis(test, result));
   }
 
   private async generateAnalysis(
@@ -53,7 +56,7 @@ export default class AiReporter implements Reporter {
 
     const trace = result.attachments.find((a) => a.name === 'trace');
 
-    console.log('\n🤖 Gemini sedang menganalisis...');
+    console.log('\n🤖 Gemini is analyzing the test failure...');
 
     const analysis = await AiHelper.analyze({
       testName: test.title,
@@ -72,5 +75,9 @@ export default class AiReporter implements Reporter {
     console.log('\n================ GEMINI ANALYSIS =================\n');
     console.log(analysis);
     console.log('\n==================================================\n');
+  }
+
+  async onEnd(): Promise<void> {
+    await Promise.all(this.pendingAnalyses);
   }
 }
