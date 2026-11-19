@@ -1,13 +1,21 @@
+
 {
-  "name": "playwright-ai",
+  "name": "qa-insight",
   "version": "1.0.0",
-  "description": "",
+  "description": "An intelligent Playwright test automation framework with AI-powered failure analysis and evidence reporting.",
   "main": "index.js",
   "scripts": {},
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "qa-insight",
+    "playwright",
+    "test-automation",
+    "typescript",
+    "ai-failure-analysis",
+    "qa"
+  ],
+  "author": "Nandhana Sri",
   "license": "ISC",
-  "type": "commonjs",
+  "type": "module",
   "devDependencies": {
     "@playwright/test": "^1.61.1",
     "@types/node": "^26.1.1",
